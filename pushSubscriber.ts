@@ -1,10 +1,13 @@
 // Based on https://github.com/gauntface/simple-push-demo/blob/main/frontend/scripts/push-client.js Apache License 2.0
 
+/** All states that the push subscription can be in */
 export type SubscriptionState =
   (typeof PushSubscriber)['STATES'][keyof (typeof PushSubscriber)['STATES']]
 
 /**
  * Wraps the `pushManager.getSubscription` API in a simple state machine with callback hooks
+ *
+ * `await PushSubscriber.init()` MUST be called before use
  */
 export class PushSubscriber {
   public static STATES = {
@@ -102,6 +105,10 @@ export class PushSubscriber {
     // this.init()
   }
 
+  /**
+   * Initialize the subscriber, resolves when it is read
+   * MUST BE CALLED
+   */
   async init() {
     await navigator.serviceWorker.ready
     this.onStateChange?.(PushSubscriber.STATES.INITIALIZING)
@@ -126,7 +133,7 @@ export class PushSubscriber {
     }
   }
 
-  async setUpPushPermission() {
+  private async setUpPushPermission(): Promise<void> {
     try {
       this.permissionStateChange(Notification.permission)
 
@@ -149,6 +156,11 @@ export class PushSubscriber {
     }
   }
 
+  /**
+   * Try to get push subscription
+   * - If this is the first time the user will get a prompt from the browser.
+   * - If the user has previously responded to the prompt the previous state will be set.
+   */
   async subscribeDevice(): Promise<PushSubscription | null> {
     this.onStateChange?.(PushSubscriber.STATES.STARTING_SUBSCRIBE)
 
@@ -166,14 +178,11 @@ export class PushSubscriber {
 
       // We need the service worker registration to access the push manager
       try {
-        console.log('checking sw sub')
         const reg = await navigator.serviceWorker.ready
-        console.log('worker ready')
         const subscription = await reg.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: this.publicAppKey,
         })
-        console.log('sub collected')
         this.onStateChange?.(PushSubscriber.STATES.SUBSCRIBED)
         this.onUpdate(subscription)
         return subscription
@@ -189,6 +198,9 @@ export class PushSubscriber {
     return null
   }
 
+  /**
+   * Remove subscription for the current device, if one exists
+   */
   async unsubscribeDevice() {
     // Disable the switch so it can't be changed while
     // we process permissions
@@ -230,6 +242,9 @@ export class PushSubscriber {
   }
 }
 
+/**
+ * Encode a string to a Uint8Array Buffer. Useful for service worker communication
+ */
 export function base64UrlToUint8Array(
   base64UrlData: string
 ): Uint8Array<ArrayBuffer> {

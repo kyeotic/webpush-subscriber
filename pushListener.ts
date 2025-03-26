@@ -27,6 +27,9 @@ export type PushListenerOptions = {
   handleNotificationError?: (event: Event) => void
 }
 
+/**
+ * Listen for PushEvent and notification interactions
+ */
 export class PushListener {
   private _handlePushEvent: (event: PushEvent) => void
   private _handleNotificationClick: (event: NotificationEvent) => void
