@@ -1,1 +1,1 @@
-export { PushSubscriber } from './pushSubscriber'
+export { PushSubscriber } from './pushSubscriber.ts'
