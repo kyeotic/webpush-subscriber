@@ -1,17 +1,15 @@
 {
   "name": "@kyeotic/push-subscriber",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "MIT",
   "exports": {
     ".": "./mod.ts"
   },
   "tasks": {
-    "publish": "deno publish"
+    "publish": "deno publish",
+    "check": "deno publish --dry-run"
   },
   "compilerOptions": {
-    "lib": ["dom", "es2015"]
-  },
-  "publish": {
-    "exclude": ["./old"]
+    "lib": ["es2015", "dom", "webworker"]
   }
 }
