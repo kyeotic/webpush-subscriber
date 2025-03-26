@@ -230,7 +230,9 @@ export class PushSubscriber {
   }
 }
 
-export function base64UrlToUint8Array(base64UrlData: string) {
+export function base64UrlToUint8Array(
+  base64UrlData: string
+): Uint8Array<ArrayBuffer> {
   const padding = '='.repeat((4 - (base64UrlData.length % 4)) % 4)
   const base64 = (base64UrlData + padding).replace(/-/g, '+').replace(/_/g, '/')
 
